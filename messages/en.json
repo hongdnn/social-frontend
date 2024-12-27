@@ -1,0 +1,11 @@
+{
+    "LoginPage": {
+        "email": "Email",
+        "password": "Password",
+        "signIn": "Sign in",
+        "forgotPassword": "Forgot password",
+        "doNotHaveAccount": "Don't have an account?",
+        "signUp": "Sign up",
+        "loginFailed": "Your email or password is incorrect. Please try again."
+    }
+}

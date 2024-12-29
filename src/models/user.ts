@@ -13,7 +13,7 @@ export interface UserModel {
   lastName: string;
   email: string;
   phone: string;
-  image: string;
+  image: string | null;
 }
 
 export const mapFromDTO = (dto: UserDTO): UserModel => {
@@ -23,7 +23,7 @@ export const mapFromDTO = (dto: UserDTO): UserModel => {
     lastName: dto.last_name,
     email: dto.email,
     phone: dto.phone ?? "",
-    image: dto.image ?? "",
+    image: dto.image ?? null,
   };
 };
 

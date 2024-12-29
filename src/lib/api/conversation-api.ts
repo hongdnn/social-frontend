@@ -17,7 +17,6 @@ export const conversationApi = {
       const response = await chatServiceInstance.get<ApiResponse<ConversationDTO[]>>("/conversations", {
         params: { size, date },
       });
-      console.log('response:  ',response);
       
       return {
         status: response.data.status,

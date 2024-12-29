@@ -1,7 +1,7 @@
 "use client";
 
 import { Toolbar } from "@/src/components/Toolbar";
-import { useEffect } from "react";
+import {  useCallback, useEffect, useMemo, useRef } from "react";
 import { useChat } from "./hooks/use-chat";
 import { ConversationList } from "@/src/components/chat/ConversationList";
 import { Message } from "@/src/components/chat/Message";
@@ -10,8 +10,10 @@ import { useSocket } from "../socket-context";
 import { MessageModel, MessageType } from "@/src/models/message";
 import { ChatInput } from "@/src/components/chat/ChatInput";
 import { ConversationType } from "@/src/models/conversation";
+import { debounce, throttle } from 'lodash';
 
 export default function Home() {
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const { subscribeToMessages, sendPrivateMessage } = useSocket();
   
   const {
@@ -25,6 +27,7 @@ export default function Home() {
     setUser,
     messageRefs,
     receiveNewMessage,
+    loadMoreMessages,
   } = useChat();
 
   useEffect(() => {
@@ -42,6 +45,14 @@ export default function Home() {
       unsubscribe();
     };
   }, [subscribeToMessages, receiveNewMessage])
+
+  const handleScroll = useMemo(() => debounce(() => {
+      const container = messagesContainerRef.current;
+      if (container && container.scrollTop < 250) {
+        console.log('container.scrollTop, ',container.scrollTop)
+        loadMoreMessages();
+      }
+    }, 500), [loadMoreMessages]);
 
   const handleSendMessage = (message: string) => {
     if (!currentConversation || !user) return;
@@ -67,6 +78,7 @@ export default function Home() {
       <ConversationList
         conversations={conversations}
         loading={loading}
+        user={user}
         onConversationClick={(id) => handleConversationClick(id)}
       />
 
@@ -74,11 +86,11 @@ export default function Home() {
       <div className="flex flex-grow flex-col shadow-md">
         {/* Header */}
         <div className="border-b p-4 min-h-[65px]">
-          <h2 className="text-lg font-semibold">{currentConversation?.getConversationName()}</h2>
+          <h2 className="text-lg font-semibold">{currentConversation?.getConversationName(user?.id)}</h2>
         </div>
 
         {/* Messages */}
-        <div className="flex-grow space-y-4 overflow-y-auto p-4">
+        <div ref={messagesContainerRef} onScroll={handleScroll} className="flex-grow space-y-4 overflow-y-auto p-4">
           {currentConversation !== null ? (
             currentConversation.messages.map((messageModel) => (
               <Message

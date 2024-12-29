@@ -14,7 +14,7 @@ export const useLogin = () => {
 
     try {
       const response = await userApi.login(email, password);
-      if (response.status == 0) {
+      if (response.status === 0) {
         await connectSocket(response.token ?? '');
         document.cookie = `tk=${response.token ?? ''}; path=/; max-age=2592000`;
         localStorage.setItem('auth_token', response.token ?? '')

@@ -1,18 +1,22 @@
 import { ConversationModel } from "@/src/models/conversation";
 import { ReactNode } from "react";
 import { Conversation } from "./Conversation";
+import { UserModel } from "@/src/models/user";
 
 export const ConversationList: React.FC<{
   conversations: ConversationModel[];
   loading: boolean;
+  user: UserModel | null;
   onConversationClick: (id: string) => void;
 }> = ({
   conversations,
   loading,
+  user,
   onConversationClick,
 }: {
   conversations: ConversationModel[];
   loading: boolean;
+  user: UserModel | null;
   onConversationClick: (id: string) => void;
 }): ReactNode => {
   return (
@@ -28,6 +32,7 @@ export const ConversationList: React.FC<{
             <Conversation
               key={index}
               conversationModel={conversations[index]}
+              user={user}
               onClick={(id) => onConversationClick(id)}
             />
           ))

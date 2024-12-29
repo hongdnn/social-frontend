@@ -3,15 +3,19 @@
 import { ReactNode, useState } from "react";
 import Image from "next/image";
 import { ConversationModel } from "@/src/models/conversation";
+import { UserModel } from "@/src/models/user";
 
 export const Conversation: React.FC<{
   conversationModel: ConversationModel;
+  user: UserModel | null;
   onClick: (id: string) => void
 }> = ({
   conversationModel,
+  user,
   onClick
 }: {
   conversationModel: ConversationModel,
+  user: UserModel | null;
   onClick: (id: string) => void
 }): ReactNode => {
   const { id, image, messages } = conversationModel;
@@ -33,7 +37,7 @@ export const Conversation: React.FC<{
       />
       <div className="flex min-w-0 flex-col">
         <label htmlFor="name" className="font-semibold">
-          {conversationModel.getConversationName()}
+          {conversationModel.getConversationName(user?.id)}
         </label>
         <label className="truncate text-sm" htmlFor="message">
           {messages[messages.length - 1].message}

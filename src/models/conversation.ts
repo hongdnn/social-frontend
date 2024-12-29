@@ -25,18 +25,22 @@ export class ConversationModel {
   members: MemberModel[];
   messages: MessageModel[];
 
-  constructor(id: string, conversationName: string, conversationType: number,
+  constructor(
+    id: string,
+    conversationName: string,
+    conversationType: number,
     image: string,
     createdDate: Date,
     members: MemberModel[],
-    messages: MessageModel[]) {
-    this.id = id; 
+    messages: MessageModel[],
+  ) {
+    this.id = id;
     this.conversationName = conversationName;
     this.conversationType = conversationType;
     this.image = image;
     this.createdDate = createdDate;
     this.members = members;
-    this.messages = messages; 
+    this.messages = messages;
   }
 
   static fromDTO(dto: ConversationDTO): ConversationModel {
@@ -45,9 +49,11 @@ export class ConversationModel {
       dto.conversation_name ?? "",
       dto.conversation_type,
       dto.image ?? "",
-      dto.created_date, 
-      (dto.members ?? []).map((memberDTO) => MemberModel.fromDTO(memberDTO)), 
-      (dto.messages ?? []).map((messageDTO) => MessageModel.fromDTO(messageDTO)) 
+      dto.created_date,
+      (dto.members ?? []).map((memberDTO) => MemberModel.fromDTO(memberDTO)),
+      (dto.messages ?? []).map((messageDTO) =>
+        MessageModel.fromDTO(messageDTO),
+      ),
     );
   }
 
@@ -63,11 +69,19 @@ export class ConversationModel {
     };
   }
 
-  getConversationName() {
-    return this.conversationName.trim()
-      ? this.conversationName
-      : this.messages[0]?.sender.nickName.trim()
-        ? this.messages[0].sender.nickName
-        : `${this.messages[0]?.sender.firstName} ${this.messages[0]?.sender.lastName}`;
+  getConversationName(userId: string = "") {
+    if (this.conversationName.trim()) {
+      return this.conversationName;
+    }
+    if (this.conversationType === ConversationType.Private) {
+      const member = this.members.find((member) => member.userId !== userId);
+      if (member) {
+        return member.nickName.trim()
+          ? member.nickName
+          : `${member.firstName} ${member.lastName}`;
+      }
+    }
+
+    return "";
   }
 }

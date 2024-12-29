@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { MessageModel } from '@/src/models/message';
 import { SocketManager } from '../lib/socket/socket-manager';
 
@@ -33,8 +33,14 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     }
   }, [socketManager]);
 
+  useEffect(() => {
+    const storedToken = localStorage.getItem("auth_token");
+    if (storedToken) {
+      connectSocket(storedToken);
+    }
+  }, [connectSocket]);
+
   const disconnectSocket = useCallback(() => {
-    console.log("disconnectSocket")
     socketManager.disconnect();
     setIsConnected(false);
   }, [socketManager]);

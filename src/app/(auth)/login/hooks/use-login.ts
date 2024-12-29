@@ -21,7 +21,6 @@ export const useLogin = () => {
         localStorage.setItem('user', JSON.stringify(response.user))
         router.push("/");
       } else {
-        console.log(response);
         setError(response.message);
       }
     } catch (error) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { Toolbar } from "@/src/components/Toolbar";
-import {  useCallback, useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useChat } from "./hooks/use-chat";
 import { ConversationList } from "@/src/components/chat/ConversationList";
 import { Message } from "@/src/components/chat/Message";
@@ -10,12 +10,12 @@ import { useSocket } from "../socket-context";
 import { MessageModel, MessageType } from "@/src/models/message";
 import { ChatInput } from "@/src/components/chat/ChatInput";
 import { ConversationType } from "@/src/models/conversation";
-import { debounce, throttle } from 'lodash';
+import { debounce } from "lodash";
 
 export default function Home() {
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const { subscribeToMessages, sendPrivateMessage } = useSocket();
-  
+
   const {
     loading,
     error,
@@ -37,36 +37,43 @@ export default function Home() {
 
   useEffect(() => {
     const unsubscribe = subscribeToMessages((message: MessageModel) => {
-      receiveNewMessage(message)
+      receiveNewMessage(message);
     });
 
     // Clean up the subscription when the component unmounts
     return () => {
       unsubscribe();
     };
-  }, [subscribeToMessages, receiveNewMessage])
+  }, [subscribeToMessages, receiveNewMessage]);
 
-  const handleScroll = useMemo(() => debounce(() => {
-      const container = messagesContainerRef.current;
-      if (container && container.scrollTop < 250) {
-        console.log('container.scrollTop, ',container.scrollTop)
-        loadMoreMessages();
-      }
-    }, 500), [loadMoreMessages]);
+  const handleScroll = useMemo(
+    () =>
+      debounce(() => {
+        const container = messagesContainerRef.current;
+        if (container && container.scrollTop < 250) {
+          console.log("container.scrollTop, ", container.scrollTop);
+          loadMoreMessages();
+        }
+      }, 500),
+    [loadMoreMessages],
+  );
 
   const handleSendMessage = (message: string) => {
     if (!currentConversation || !user) return;
 
-    const receiverId = currentConversation.conversationType === ConversationType.Private
-      ? currentConversation.members.find(member => member.userId !== user.id)?.userId
-      : '';
-    if(receiverId) {
+    const receiverId =
+      currentConversation.conversationType === ConversationType.Private
+        ? currentConversation.members.find(
+            (member) => member.userId !== user.id,
+          )?.userId
+        : "";
+    if (receiverId) {
       sendPrivateMessage({
-        sender_id: user?.id ?? '',
+        sender_id: user?.id ?? "",
         receiver_id: receiverId,
         message: message,
         message_type: MessageType.Text,
-      })
+      });
     }
   };
 
@@ -85,12 +92,18 @@ export default function Home() {
       {/* Chat Room */}
       <div className="flex flex-grow flex-col shadow-md">
         {/* Header */}
-        <div className="border-b p-4 min-h-[65px]">
-          <h2 className="text-lg font-semibold">{currentConversation?.getConversationName(user?.id)}</h2>
+        <div className="min-h-[65px] border-b p-4">
+          <h2 className="text-lg font-semibold">
+            {currentConversation?.getConversationName(user?.id)}
+          </h2>
         </div>
 
         {/* Messages */}
-        <div ref={messagesContainerRef} onScroll={handleScroll} className="flex-grow space-y-4 overflow-y-auto p-4">
+        <div
+          ref={messagesContainerRef}
+          onScroll={handleScroll}
+          className="flex-grow space-y-4 overflow-y-auto p-4"
+        >
           {currentConversation !== null ? (
             currentConversation.messages.map((messageModel) => (
               <Message
@@ -111,7 +124,11 @@ export default function Home() {
         </div>
 
         {/* Input Box */}
-        <ChatInput onSend={(message) => {handleSendMessage(message)}}/>
+        <ChatInput
+          onSend={(message) => {
+            handleSendMessage(message);
+          }}
+        />
       </div>
     </div>
   );

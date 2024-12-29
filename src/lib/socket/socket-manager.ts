@@ -66,23 +66,13 @@ export class SocketManager {
     private setupEventListeners() {
         if (!this.socket) return;
 
-        this.socket.on("connect", () => {
-            console.log("Socket connected successfully");
-        });
-
         this.socket.on("disconnect", (reason) => {
             console.warn("Socket disconnected:", reason);
-        });
-
-        this.socket.on("connect_error", (error) => {
-            console.error("Socket connection error:", error);
-            this.notifyError(new Error(`Connection failed: ${error}`));
         });
 
         this.socket.on("receive_private_message", (response: ServerResponse) => {
             try {
                 if (response.status === 0) {
-                    console.log(response.data)
                     const message = this.parseMessage(response.data);
                     if (message) {
                         this.notifyMessage(message);

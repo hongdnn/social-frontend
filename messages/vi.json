@@ -6,6 +6,23 @@
         "forgotPassword": "Quên mật khẩu?",
         "doNotHaveAccount": "Chưa có tài khoản?",
         "signUp": "Đăng ký",
-        "loginFailed": "Email hoặc mật khẩu không đúng. Xin hãy thử lại."
+        "loginFailed": "Email hoặc mật khẩu không đúng. Xin hãy thử lại.",
+        "signUpSuccess": "Bạn đã tạo tài khoản thành công. Vui lòng đăng nhập."
+    },
+    "SignUpPage": {
+        "email": "Email",
+        "firstName": "Tên",
+        "lastName": "Họ",
+        "phone": "Số điện thoại",
+        "phonePlaceholder": "Nhập số điện thoại của bạn",
+        "password": "Mật khẩu",
+        "passwordPlaceholder": "Nhập mật khẩu",
+        "signUp": "Đăng ký",
+        "completeSteps": "Hoàn thành các bước đơn giản để đăng ký tài khoản",
+        "getStarted": "Bắt đầu với chúng tôi",
+        "signUpAccount": "Đăng Ký Tài Khoản",
+        "enterInfo": "Điền thông tin của bạn để tạo tài khoản",
+        "hadAccount": "Đã có tài khoản?",
+        "signIn": "Đăng nhập"
     }
 }

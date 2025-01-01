@@ -7,8 +7,11 @@ export const useLogin = () => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { connectSocket } = useSocket();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [signUpAlert, setSignUpAlert] = useState(false);
 
-  const login = async (email: string, password: string) => {
+  const login = async () => {
     setLoading(true);
     setError(null);
 
@@ -31,5 +34,5 @@ export const useLogin = () => {
     }
   };
 
-  return { login, loading, error };
+  return { login, loading, error, router, email, password, signUpAlert, setEmail, setPassword, setSignUpAlert };
 };

@@ -7,36 +7,57 @@ export interface UserDTO {
   image?: string | null;
 }
 
-export interface UserModel {
+export class UserModel {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
   image: string | null;
+
+  constructor(
+    id: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    phone: string,
+    image: string | null
+  ) {
+    this.id = id;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.phone = phone;
+    this.image = image;
+  }
+
+  static fromDTO(dto: UserDTO): UserModel {
+    return new UserModel(
+      dto._id,
+      dto.first_name,
+      dto.last_name,
+      dto.email,
+      dto.phone ?? "",
+      dto.image ?? null
+    );
+  }
+
+  mapToDTO(): UserDTO {
+    return {
+      _id: this.id,
+      first_name: this.firstName,
+      last_name: this.lastName,
+      email: this.email,
+      phone: this.phone || null,
+      image: this.image
+    };
+  }
+
+  getFullName(): string {
+    return `${this.firstName} ${this.lastName}`.trim();
+  }
 }
 
-export const mapFromDTO = (dto: UserDTO): UserModel => {
-  return {
-    id: dto._id,
-    firstName: dto.first_name,
-    lastName: dto.last_name,
-    email: dto.email,
-    phone: dto.phone ?? "",
-    image: dto.image ?? null,
-  };
-};
-
-export const mapToDTO = (user: UserModel): UserDTO => {
-  return {
-    _id: user.id,
-    first_name: user.firstName,
-    last_name: user.lastName,
-    email: user.email,
-    phone: user.phone,
-    image: user.image,
-  };
-};
 
 export const parseUserFromJson = (userString: string | null): UserModel | null => {
     if (!userString) return null;

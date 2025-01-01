@@ -1,6 +1,6 @@
 "use client";
 
-import { Toolbar } from "@/src/components/Toolbar";
+import { Toolbar } from "@/src/components/common/Toolbar";
 import { useEffect, useMemo, useRef } from "react";
 import { useChat } from "./hooks/use-chat";
 import { ConversationList } from "@/src/components/chat/ConversationList";

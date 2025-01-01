@@ -6,6 +6,23 @@
         "forgotPassword": "Forgot password",
         "doNotHaveAccount": "Don't have an account?",
         "signUp": "Sign up",
-        "loginFailed": "Your email or password is incorrect. Please try again."
+        "loginFailed": "Your email or password is incorrect. Please try again.",
+        "signUpSuccess": "Your account is created successfully. You can login now."
+    },
+    "SignUpPage": {
+        "email": "Email",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "phone": "Phone",
+        "phonePlaceholder": "your phone number",
+        "password": "Password",
+        "passwordPlaceholder": "your password",
+        "signUp": "Sign up",
+        "completeSteps": "Complete easy steps to register your account",
+        "getStarted": "Get Started With Us",
+        "signUpAccount": "Sign Up Account",
+        "enterInfo": "Enter your information to create an account",
+        "hadAccount": "Already had an account?",
+        "signIn": "Sign in"
     }
 }

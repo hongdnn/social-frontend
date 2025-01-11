@@ -32,7 +32,7 @@ export const Conversation: React.FC<{
         width={60}
         height={60}
         alt={"avatar"}
-        className="rounded-full bg-gray-300 object-cover"
+        className="h-[60px] w-[60px] rounded-full bg-gray-300"
         onError={handleImageError}
       />
       <div className="flex min-w-0 flex-col">

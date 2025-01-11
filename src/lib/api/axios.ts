@@ -63,4 +63,10 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+export interface ErrorResponse {
+  status: number;
+  error?: string;
+  message: string;
+}
+
 export { chatServiceInstance, postServiceInstance };

@@ -1,5 +1,5 @@
-import { chatServiceInstance } from "@/src/lib/api/axios";
-import { UserModel } from "@/src/models/user";
+import { ApiResponse, chatServiceInstance } from "@/src/lib/api/axios";
+import { UserDTO, UserModel } from "@/src/models/user";
 
 interface LoginResponse {
   status: number;
@@ -11,6 +11,12 @@ interface LoginResponse {
 interface SignUpResponse {
   status: number;
   message: string;
+}
+
+interface SearchUsersResponse {
+  status: number;
+  message: string;
+  data: UserModel[];
 }
 
 export const userApi = {
@@ -39,7 +45,6 @@ export const userApi = {
 
   register: async (first_name: string, last_name: string, email: string, password: string, phone?: string): Promise<SignUpResponse> => {
     try {
-      console.log({first_name, last_name, email, phone, password})
       const response = await chatServiceInstance.post("/users/register", {
         first_name, last_name, email, phone, password
       });
@@ -55,4 +60,26 @@ export const userApi = {
       };
     }
   },
+
+  searchUsers: async (keyword: string): Promise<SearchUsersResponse> => {
+    try {
+      const response = await chatServiceInstance.get<ApiResponse<UserDTO[]>>("/users", {
+        params: { keyword },
+      });
+      
+      return {
+        status: response.data.status,
+        message: response.data.message,
+        data: response.data.data.map(userDTO => UserModel.fromDTO(userDTO))
+      }
+    } catch (error) {
+      console.log(error)
+      return {
+        status: 1,
+        message: "There's something wrong",
+        data: []
+      };
+    }
+  }
+
 };

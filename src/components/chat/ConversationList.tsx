@@ -2,27 +2,32 @@ import { ConversationModel } from "@/src/models/conversation";
 import { ReactNode } from "react";
 import { Conversation } from "./Conversation";
 import { UserModel } from "@/src/models/user";
+import { SquarePen } from "lucide-react";
 
 export const ConversationList: React.FC<{
   conversations: ConversationModel[];
   loading: boolean;
   user: UserModel | null;
   onConversationClick: (id: string) => void;
+  onCreateConversation: () => void
 }> = ({
   conversations,
   loading,
   user,
   onConversationClick,
+  onCreateConversation
 }: {
   conversations: ConversationModel[];
   loading: boolean;
   user: UserModel | null;
   onConversationClick: (id: string) => void;
+  onCreateConversation: () => void;
 }): ReactNode => {
   return (
-    <div className="flex w-[20%] flex-col shadow-md">
-      <div className="min-h-[65px] border-b p-4">
+    <div className="flex w-[20%] flex-col border-r shadow-md">
+      <div className="flex min-h-[65px] justify-between border-b p-4">
         <h2 className="text-lg font-semibold">Chats</h2>
+        <SquarePen onClick={onCreateConversation} className="size-6 text-white" />
       </div>
       <div className="flex-grow overflow-y-auto py-2">
         {loading ? (

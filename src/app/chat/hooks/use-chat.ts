@@ -2,7 +2,7 @@ import { conversationApi } from "@/src/lib/api/conversation-api";
 import { messageApi } from "@/src/lib/api/message-api";
 import { ConversationModel } from "@/src/models/conversation";
 import { MessageModel } from "@/src/models/message";
-import {  UserModel } from "@/src/models/user";
+import { UserModel } from "@/src/models/user";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export const useChat = () => {
@@ -17,6 +17,7 @@ export const useChat = () => {
   /* store the conversations state inside useCallback without creating a dependency */
   const conversationsRef = useRef<ConversationModel[]>([]);
   const currentConversationRef = useRef<ConversationModel>(null);
+  const [isNewMessageModalOpen, setIsNewMessageModalOpen] = useState(false);
 
   useEffect(() => {
     conversationsRef.current = conversations;
@@ -27,17 +28,20 @@ export const useChat = () => {
   }, [currentConversation]);
 
   /* scroll to a specific message, such as latest message in the bottom */
-  const scrollToMessage = useCallback((messageId: string, autoBehavior?: boolean) => {
-    setTimeout(() => {
-      const messageElement = messageRefs.current[messageId];
-      if (messageElement) {
-        messageElement.scrollIntoView({
-          behavior: autoBehavior === true ? 'auto' : 'smooth',
-          block: "center",
-        });
-      }
-    }, 1);
-  }, []);
+  const scrollToMessage = useCallback(
+    (messageId: string, autoBehavior?: boolean) => {
+      setTimeout(() => {
+        const messageElement = messageRefs.current[messageId];
+        if (messageElement) {
+          messageElement.scrollIntoView({
+            behavior: autoBehavior === true ? "auto" : "smooth",
+            block: "center",
+          });
+        }
+      }, 1);
+    },
+    [],
+  );
 
   /* fetch list of conversations in the chat page */
   const getConversations = useCallback(async (loadMore?: boolean) => {
@@ -45,14 +49,17 @@ export const useChat = () => {
     setError(null);
 
     try {
-        /* get the latest message time of oldest conversation if existed to load more */
-        let lastMessageDate
-        if(loadMore !== false && conversationsRef.current.length > 0) {
-            const oldestMessages = conversationsRef.current[0].messages
-            lastMessageDate = oldestMessages[oldestMessages.length - 1].createdDate
-        }
+      /* get the latest message time of oldest conversation if existed to load more */
+      let lastMessageDate;
+      if (loadMore !== false && conversationsRef.current.length > 0) {
+        const oldestMessages = conversationsRef.current[0].messages;
+        lastMessageDate = oldestMessages[oldestMessages.length - 1].createdDate;
+      }
 
-        const response = await conversationApi.getConversations(15, lastMessageDate);
+      const response = await conversationApi.getConversations(
+        15,
+        lastMessageDate,
+      );
       if (response.status === 0) {
         setConversations(response.conversations);
       } else {
@@ -68,7 +75,6 @@ export const useChat = () => {
 
   /* load more messages in the current conversation(in chat room) */
   const loadMoreMessages = useCallback(async () => {
-
     try {
       /* get the oldest message create time if existed to load more */
       if (
@@ -91,7 +97,7 @@ export const useChat = () => {
             [...response.messages, ...currentConversationRef.current.messages],
           );
           setCurrentConversation(updatedCurrentConversation);
-        } 
+        }
       }
     } catch (error) {
       console.log(error);
@@ -112,31 +118,71 @@ export const useChat = () => {
   };
 
   /* handle new message from socket */
-  const receiveNewMessage = useCallback((newMessage: MessageModel) => {
-    const index = conversationsRef.current.findIndex(
-      conv => conv.id === newMessage.conversation?.id
-    );
-    
-    if (index !== -1) {
-      const newConversations = [...conversationsRef.current];
-      newConversations[index] = new ConversationModel(
-        newConversations[index].id,
-        newConversations[index].conversationName,
-        newConversations[index].conversationType,
-        newConversations[index].image,
-        newConversations[index].createdDate,
-        newConversations[index].members,
-        [...newConversations[index].messages, newMessage],
+  const receiveNewMessage = useCallback(
+    async (newMessage: MessageModel) => {
+      const index = conversationsRef.current.findIndex(
+        (conv) => conv.id === newMessage.conversation?.id,
       );
-      setConversations(newConversations);
+  
+      if (index !== -1) {
+        const newConversations = [...conversationsRef.current];
+        newConversations[index] = new ConversationModel(
+          newConversations[index].id,
+          newConversations[index].conversationName,
+          newConversations[index].conversationType,
+          newConversations[index].image,
+          newConversations[index].createdDate,
+          newConversations[index].members,
+          [...newConversations[index].messages, newMessage],
+        );
+  
+        setConversations(newConversations);
+  
+        /* If the new message belongs to the current conversation, scroll to it */
+        if (
+          currentConversationRef.current &&
+          currentConversationRef.current.id === newMessage.conversation?.id
+        ) {
+          setCurrentConversation(newConversations[index]);
+          scrollToMessage(newMessage.id, false);
+        }
+      } else {
+        try {
+          const response = await conversationApi.fetchConversation(newMessage.conversation?.id ?? '')
+          if(response.status === 0) {
+            const newConversations = [response.conversation!,...conversationsRef.current];
+            setConversations(newConversations);
+  
+            /* If the new message belongs to the current conversation, scroll to it */
+            if (
+              currentConversationRef.current &&
+              currentConversationRef.current.id === newMessage.conversation?.id
+            ) {
+              setCurrentConversation(response.conversation!);
+              scrollToMessage(newMessage.id, false);
+            }
+          }
+        } catch (error) {
+          console.log(error)
+        }
+      }
+    },
+    [scrollToMessage],
+  );
 
-      /* If the new message belongs to the current conversation, scroll to it */
-    if (currentConversationRef.current && currentConversationRef.current.id === newMessage.conversation?.id) {
-      setCurrentConversation(newConversations[index])
-      scrollToMessage(newMessage.id, false)
+  /* when create a new conversation */
+  const fetchNewConversation = useCallback(async (userIds: string[]) => {
+    setError(null);
+    try {
+      const response =
+        await conversationApi.fetchConversationByUserIds(userIds);
+      if (response.status === 0) {
+        setCurrentConversation(response.conversation);
+      }
+    } catch (error) {
+      setError(`${error}`);
     }
-    }
-  }, [scrollToMessage]);
+  }, []);
 
   return {
     loading,
@@ -151,5 +197,8 @@ export const useChat = () => {
     scrollToMessage,
     receiveNewMessage,
     loadMoreMessages,
+    isNewMessageModalOpen,
+    setIsNewMessageModalOpen,
+    fetchConversation: fetchNewConversation,
   };
 };

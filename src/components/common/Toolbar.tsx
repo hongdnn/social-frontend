@@ -3,9 +3,20 @@
 import Link from "next/link";
 import { ReactNode, useState } from "react";
 import { CreatePostModal } from "./CreatePostModal";
+import { SearchPanel } from "./SearchPanel";
 
 export const Toolbar: React.FC = (): ReactNode => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+
+  const handleNavClick = (type?: string) => {
+    if (type === 'search') {
+      setIsSearchOpen(!isSearchOpen);
+    } else {
+      setIsSearchOpen(false);
+    }
+  };
 
   return (
     <>
@@ -18,12 +29,19 @@ export const Toolbar: React.FC = (): ReactNode => {
             </Link>
           </li>
           <li>
-            <Link href="/search" className="cursor-pointer hover:text-primary">
+            <button
+              className="cursor-pointer hover:text-primary"
+              onClick={() => handleNavClick("search")}
+            >
               Search
-            </Link>
+            </button>
           </li>
           <li>
-            <Link href="/chat" className="cursor-pointer hover:text-primary">
+            <Link
+              href="/chat"
+              className="cursor-pointer hover:text-primary"
+              onClick={() => handleNavClick()}
+            >
               Chat
             </Link>
           </li>
@@ -55,6 +73,10 @@ export const Toolbar: React.FC = (): ReactNode => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
+
+      {isSearchOpen && (
+        <SearchPanel isOpen={isSearchOpen} />
+      )}
     </>
   );
 };

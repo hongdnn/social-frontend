@@ -1,17 +1,23 @@
 'use client'
 
 import Link from "next/link";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { CreatePostModal } from "./CreatePostModal";
 import { SearchPanel } from "./SearchPanel";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { parseUserFromJson, UserModel } from "@/src/models/user";
 
 export const Toolbar: React.FC = (): ReactNode => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const router = useRouter();
+  const [user, setUser] = useState<UserModel | null>(null);
 
+useEffect(() => {
+  const storedUser = parseUserFromJson(localStorage.getItem("user"));
+  setUser(storedUser);
+}, []);
 
   const handleNavClick = (type?: string) => {
     if (type === 'search') {
@@ -64,7 +70,7 @@ export const Toolbar: React.FC = (): ReactNode => {
             </Link>
           </li>
           <li>
-            <Link href="/profile" className="cursor-pointer hover:text-primary">
+            <Link href={`/${user?.id}`} className="cursor-pointer hover:text-primary">
               Profile
             </Link>
           </li>

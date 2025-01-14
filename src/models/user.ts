@@ -2,9 +2,12 @@ export interface UserDTO {
   _id: string;
   first_name: string;
   last_name: string;
-  email: string;
+  email?: string;
   phone?: string | null;
   image?: string | null;
+  is_following?: boolean;
+  followers?: number;
+  followees?: number;
 }
 
 export class UserModel {
@@ -14,6 +17,9 @@ export class UserModel {
   email: string;
   phone: string;
   image: string | null;
+  isFollowing?: boolean;
+  followers?: number;
+  followees?: number;
 
   constructor(
     id: string,
@@ -21,7 +27,10 @@ export class UserModel {
     lastName: string,
     email: string,
     phone: string,
-    image: string | null
+    image: string | null,
+    is_following?: boolean,
+    followers?: number,
+    followees?: number
   ) {
     this.id = id;
     this.firstName = firstName;
@@ -29,6 +38,9 @@ export class UserModel {
     this.email = email;
     this.phone = phone;
     this.image = image;
+    this.isFollowing = is_following;
+    this.followers = followers;
+    this.followees = followees;
   }
 
   static fromDTO(dto: UserDTO): UserModel {
@@ -36,9 +48,12 @@ export class UserModel {
       dto._id,
       dto.first_name,
       dto.last_name,
-      dto.email,
+      dto.email ?? '',
       dto.phone ?? "",
-      dto.image ?? null
+      dto.image ?? null,
+      dto.is_following,
+      dto.followers,
+      dto.followees,
     );
   }
 

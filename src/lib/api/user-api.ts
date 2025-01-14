@@ -19,6 +19,12 @@ interface SearchUsersResponse {
   data: UserModel[];
 }
 
+interface FetchProfileResponse {
+  status: number;
+  message: string;
+  data: UserModel | null;
+}
+
 export const userApi = {
   login: async (email: string, password: string): Promise<LoginResponse> => {
     try {
@@ -78,6 +84,25 @@ export const userApi = {
         status: 1,
         message: "There's something wrong",
         data: []
+      };
+    }
+  },
+
+  fetchProfile: async (user_id: string): Promise<FetchProfileResponse> => {
+    try {
+      const response = await chatServiceInstance.get<ApiResponse<UserDTO>>(`/users/profile/${user_id}`);
+      
+      return {
+        status: response.data.status,
+        message: response.data.message,
+        data: UserModel.fromDTO(response.data.data)
+      }
+    } catch (error) {
+      console.log(error)
+      return {
+        status: 1,
+        message: "There's something wrong",
+        data: null
       };
     }
   }

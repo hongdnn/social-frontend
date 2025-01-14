@@ -1,8 +1,8 @@
 export interface MediaMetadata {
   width: number;
   height: number;
-  duration?: number; 
-  frameRate?: number; 
+  duration?: number;
+  frameRate?: number;
 }
 
 /**
@@ -10,7 +10,9 @@ export interface MediaMetadata {
  * @param file Image file to process
  * @returns Promise resolving to MediaMetadata
  */
-export const getImageDimensions = async (file: File): Promise<MediaMetadata> => {
+export const getImageDimensions = async (
+  file: File,
+): Promise<MediaMetadata> => {
   if (!file.type.startsWith("image/")) {
     throw new Error("File is not an image");
   }
@@ -21,7 +23,7 @@ export const getImageDimensions = async (file: File): Promise<MediaMetadata> => 
       resolve({ width: img.width, height: img.height });
     };
     img.onerror = () => {
-      reject(new Error('Failed to load image'));
+      reject(new Error("Failed to load image"));
     };
     img.src = URL.createObjectURL(file);
   });
@@ -38,12 +40,12 @@ export const getVideoMetadata = async (file: File): Promise<MediaMetadata> => {
   }
 
   return new Promise((resolve, reject) => {
-    const video = document.createElement('video');
-    video.preload = 'metadata';
+    const video = document.createElement("video");
+    video.preload = "metadata";
 
     video.onloadedmetadata = () => {
       // Using getVideoPlaybackQuality for frame rate if available
-      const frameRate = video.getVideoPlaybackQuality 
+      const frameRate = video.getVideoPlaybackQuality
         ? video.getVideoPlaybackQuality().totalVideoFrames / video.duration
         : 0;
 
@@ -51,14 +53,16 @@ export const getVideoMetadata = async (file: File): Promise<MediaMetadata> => {
         width: video.videoWidth,
         height: video.videoHeight,
         duration: Math.round(video.duration),
-        frameRate: Math.round(frameRate)
+        frameRate: Math.round(frameRate),
       });
     };
 
     video.onerror = () => {
-      reject(new Error('Failed to load video metadata'));
+      reject(new Error("Failed to load video metadata"));
     };
 
     video.src = URL.createObjectURL(file);
   });
 };
+
+export const MEDIA_BASE_URL = process.env.NEXT_PUBLIC_S3_BUCKET_DOMAIN || "";

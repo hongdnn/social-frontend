@@ -1,3 +1,4 @@
+import { CONVERSATIONS_PER_PAGE, MESSAGES_PER_PAGE } from "@/src/config/config";
 import { conversationApi } from "@/src/lib/api/conversation-api";
 import { messageApi } from "@/src/lib/api/message-api";
 import { ConversationModel } from "@/src/models/conversation";
@@ -57,7 +58,7 @@ export const useChat = () => {
       }
 
       const response = await conversationApi.getConversations(
-        15,
+        CONVERSATIONS_PER_PAGE,
         lastMessageDate,
       );
       if (response.status === 0) {
@@ -83,7 +84,7 @@ export const useChat = () => {
       ) {
         const response = await messageApi.getMessages(
           currentConversationRef.current.id,
-          15,
+          MESSAGES_PER_PAGE,
           currentConversationRef.current.messages[0].createdDate,
         );
         if (response.status === 0) {

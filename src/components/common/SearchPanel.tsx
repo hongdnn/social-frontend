@@ -3,6 +3,7 @@ import { debounce } from "lodash";
 import { Search } from "lucide-react";
 import { ChangeEvent, useState } from "react";
 import { User } from "./User";
+import { useRouter } from "next/navigation";
 
 interface SearchPanelProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface SearchPanelProps {
 export const SearchPanel = ({ isOpen }: SearchPanelProps) => {
     const [searchQuery, setSearchQuery] = useState('');
     const { loading, searchResult, handleSearch } = useSearch();
+    const router = useRouter();
 
     const onSearch = debounce((query: string) => {
         handleSearch(query);
@@ -48,7 +50,7 @@ export const SearchPanel = ({ isOpen }: SearchPanelProps) => {
             {searchQuery ? (
               <div className="space-y-6">
                 {searchResult.map((user) => (
-                    <User key={user.id} user={user} onClick={(id) => {}} />
+                    <User key={user.id} user={user} onClick={(id) => {router.push(`/${id}`);}} />
                 ))}
               </div>
             ) : (

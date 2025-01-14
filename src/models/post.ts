@@ -1,4 +1,5 @@
 import { MediaDTO, MediaModel } from "./media";
+import { UserDTO, UserModel } from "./user";
 
 export interface PostDTO {
     id?: string;
@@ -10,6 +11,7 @@ export interface PostDTO {
     created_date?: Date | null; 
     updated_date?: Date | null; 
     medias?: MediaDTO[]
+    user?: UserDTO
   }
   
   export class PostModel {
@@ -22,6 +24,7 @@ export interface PostDTO {
     createdDate?: Date | null; 
     updatedDate?: Date | null; 
     medias: MediaModel[];
+    user?: UserModel;
   
     constructor(
       id: string,
@@ -33,6 +36,7 @@ export interface PostDTO {
       createdDate?: Date | null,
       updatedDate?: Date | null,
       medias?: MediaModel[],
+      user?: UserModel
     ) {
       this.id = id;
       this.content = content;
@@ -40,9 +44,10 @@ export interface PostDTO {
       this.location = location;
       this.latitude = latitude;
       this.longitude = longitude;
-      this.createdDate = createdDate;
+      this.createdDate = new Date(createdDate ?? '');
       this.updatedDate = updatedDate;
       this.medias = medias ?? [];
+      this.user = user
     }
   
     static fromDTO(dto: PostDTO): PostModel {
@@ -56,6 +61,7 @@ export interface PostDTO {
           dto.created_date, 
           dto.updated_date,
           (dto.medias ?? []).map((mediaDTO) => MediaModel.fromDTO(mediaDTO)),
+          dto.user ? UserModel.fromDTO(dto.user) : undefined
         );
       }
     

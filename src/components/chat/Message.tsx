@@ -9,7 +9,7 @@ export const Message = forwardRef<
     isCurrentUserMessage: boolean;
   }
 >(({ messageModel, isCurrentUserMessage }, ref) => {
-  const { sender, message } = messageModel;
+  const { message } = messageModel;
   return (
     <div
       ref={ref}

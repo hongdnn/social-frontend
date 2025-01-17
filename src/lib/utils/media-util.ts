@@ -65,4 +65,4 @@ export const getVideoMetadata = async (file: File): Promise<MediaMetadata> => {
   });
 };
 
-export const MEDIA_BASE_URL = process.env.NEXT_PUBLIC_S3_BUCKET_DOMAIN || "";
+export const MEDIA_BASE_URL = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_DOMAIN}`;

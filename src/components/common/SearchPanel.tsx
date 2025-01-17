@@ -11,7 +11,7 @@ interface SearchPanelProps {
 
 export const SearchPanel = ({ isOpen }: SearchPanelProps) => {
     const [searchQuery, setSearchQuery] = useState('');
-    const { loading, searchResult, handleSearch } = useSearch();
+    const { searchResult, handleSearch } = useSearch();
     const router = useRouter();
 
     const onSearch = debounce((query: string) => {

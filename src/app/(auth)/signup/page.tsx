@@ -8,7 +8,7 @@ import { FormEvent } from "react";
 
 export default function SignUpPage() {
   const t = useTranslations("SignUpPage");
-  const { signUp, loading, error, router, setFirstName, setLastName, setPassword, setEmail, setPhone } = useSignUp();
+  const { signUp, error, router, setFirstName, setLastName, setPassword, setEmail, setPhone } = useSignUp();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault(); 

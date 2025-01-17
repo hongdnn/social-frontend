@@ -20,7 +20,6 @@ export default function Chat() {
 
   const {
     loading,
-    error,
     conversations,
     getConversations,
     currentConversation,

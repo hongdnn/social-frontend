@@ -147,4 +147,37 @@ export const postApi = {
       };
     }
   },
+
+  fetchProfilePosts: async (user_id: string, size: number, date?: Date): Promise<FetchPostsResponse> => {
+    try {
+      const isoDate = date?.toISOString();
+      const response = await postServiceInstance.get<ApiResponse<PostDTO[]>>("/posts/profile", {
+        params: { user_id, size, date: isoDate },
+      });
+      
+      return {
+        status: response.data.status,
+        message: response.data.message,
+        data: response.data.data.map(postDto => PostModel.fromDTO(postDto)),
+      };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError<ErrorResponse>;
+        if (axiosError.response && axiosError.response.data) {
+          return {
+            status: axiosError.response.data.status,
+            error: axiosError.response.data.error,
+            message: axiosError.response.data.message,
+            data: []
+          };
+        }
+      }
+      return {
+        status: 1,
+        message: "There's something wrong",
+        error: `${error}`,
+        data: []
+      };
+    }
+  },
 };

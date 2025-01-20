@@ -1,7 +1,10 @@
+import { POSTS_PER_PAGE } from "@/src/config/config";
 import { followApi } from "@/src/lib/api/follow-api";
+import { postApi } from "@/src/lib/api/post-api";
 import { userApi } from "@/src/lib/api/user-api";
-import { parseUserFromJson, UserModel } from "@/src/models/user";
-import { useCallback, useState } from "react";
+import { PostModel } from "@/src/models/post";
+import { UserModel } from "@/src/models/user";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 
 
@@ -9,18 +12,52 @@ export const useProfile= () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [userProfile, setUserProfile] = useState<UserModel | null>(null);
-    const [currentUser] = useState(() => parseUserFromJson(localStorage.getItem("user")));
+    const [posts, setPosts] = useState<PostModel[]>([]);
+    const postsRef = useRef<PostModel[]>([]);
+    const [canLoadMore, setCanLoadMore] = useState<boolean>(true);
+  
+    useEffect(() => {
+      postsRef.current = posts;
+    }, [posts]);
+  
+    /* fetch list of user profile's posts */
+    const getProfilePosts = useCallback(async (userId: string) => {
+      setLoading(true);
+      setError(null);
+  
+      try {
+        let lastPostDate;
+        if (postsRef.current.length > 0) {
+          lastPostDate =
+            postsRef.current[postsRef.current.length - 1].createdDate;
+        }
+        const response = await postApi.fetchProfilePosts(userId, POSTS_PER_PAGE, lastPostDate ?? undefined);
+        if(response.error) {
+          setError(`${response.error}`);
+          setCanLoadMore(false);
+        }
+        else if (response.status === 0 && response.data.length > 0) {
+          if(response.data.length < POSTS_PER_PAGE) {
+              setCanLoadMore(false);
+          }
+          const updatedPosts = [...postsRef.current, ...response.data];
+          setPosts(updatedPosts);
+        } 
+      } catch (error) {
+        console.log(error);
+        setError("There is something wrong");
+      } finally {
+        setLoading(false);
+      }
+    }, []);
 
     const fetchUserProfile = useCallback(async(userId: string) => {
-        setLoading(true)
-        setError(null)
         const response = await userApi.fetchProfile(userId)
         if(response.status === 0) {
             setUserProfile(response.data)
         } else {
             setError(response.message)
         }
-        setLoading(false)
     }, [])
 
     const handleFollow = useCallback(async(userId: string) => {
@@ -41,5 +78,5 @@ export const useProfile= () => {
         } 
     }, [userProfile])
 
-    return { loading, error, userProfile, fetchUserProfile, currentUser, handleFollow }
+    return { loading, error, userProfile, fetchUserProfile, handleFollow, canLoadMore, posts, getProfilePosts }
 }

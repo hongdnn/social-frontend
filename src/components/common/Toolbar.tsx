@@ -96,6 +96,7 @@ useEffect(() => {
       <CreatePostModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        user={user}
       />
 
       {isSearchOpen && (

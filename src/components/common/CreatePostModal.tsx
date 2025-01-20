@@ -5,21 +5,24 @@ import { useState, useRef } from "react";
 import { Carousel, MediaFile } from "./Carousel";
 import { useCreatePost } from "@/src/app/(home)/hooks/use-create-post";
 import { debounce } from "lodash";
+import { UserModel } from "@/src/models/user";
 
 interface CreatePostModalProps {
   isOpen: boolean;
   onClose: () => void;
+  user: UserModel | null; 
 }
 
 export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   isOpen,
   onClose,
+  user,
 }) => {
   const [content, setContent] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [media, setMedia] = useState<MediaFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { handleCreatePost, loading } = useCreatePost();
+  const { handleCreatePost, loading } = useCreatePost(user);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);

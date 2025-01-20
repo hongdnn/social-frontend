@@ -2,11 +2,14 @@ import { postApi } from "@/src/lib/api/post-api";
 import { getImageDimensions, getVideoMetadata } from "@/src/lib/utils/media-util";
 import { MediaDTO } from "@/src/models/media";
 import { PostDTO } from "@/src/models/post";
+import { UserModel } from "@/src/models/user";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export const useCreatePost = () => {
+export const useCreatePost = (user: UserModel | null) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter(); 
 
   const handleCreatePost = async (content: string, files: File[]) => {
     setLoading(true);
@@ -57,7 +60,16 @@ export const useCreatePost = () => {
       }
       const response = await postApi.createPost(postDTO)
       if(response.status === 0) {
-        console.log("Create post success")
+        console.log("Create post success");
+        const currentPath = window.location.pathname;
+        const profilePath = `/${user?.id}`;
+
+        /*  Reload the profile page if already there, or navigate */
+        if (currentPath === profilePath) {
+          window.location.reload();  
+        } else {
+          router.push(profilePath);
+        }
       }
     } catch (error) {
       console.log(error);

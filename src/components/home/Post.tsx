@@ -4,15 +4,22 @@ import { Heart, MessageCircle } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { MediaCarousel } from "./MediaCarousel";
+import { debounce } from "lodash";
 
-export const Post = ({ post }: { post: PostModel }) => {
+export const Post = ({ post, onReact }: { post: PostModel, onReact: () => void }) => {
   const defaultAvatar = "/default_avatar.svg";
   const [imgSrc, setImgSrc] = useState<string>(
     post.user?.image || defaultAvatar,
   );
+  const [isReacted, setIsReacted] = useState(false);
   const handleImageError = () => {
     setImgSrc(defaultAvatar);
   };
+
+  const handleReaction = debounce(() => {
+    setIsReacted(!isReacted);
+    onReact();
+  }, 200);
 
   return (
     <div className="mb-6 rounded-lg border border-gray-700 bg-background">
@@ -48,7 +55,7 @@ export const Post = ({ post }: { post: PostModel }) => {
         <div className="mb-4 flex justify-between">
           <div className="flex space-x-4">
             <div>
-              <Heart className="h-6 w-6" />
+              <Heart className={`h-6 w-6 cursor-pointer ${isReacted ? 'text-red-500 fill-current' : null}`} onClick={handleReaction} />
             </div>
             <div>
               <MessageCircle className="h-6 w-6" />

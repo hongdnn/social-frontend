@@ -1,5 +1,6 @@
 import { POSTS_PER_PAGE } from "@/src/config/config";
 import { postApi } from "@/src/lib/api/post-api";
+import { reactionApi } from "@/src/lib/api/reaction-api";
 import { PostModel } from "@/src/models/post";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -45,5 +46,16 @@ export const usePost = () => {
     }
   }, []);
 
-  return { loading, error, posts, getPosts, canLoadMore }
+  const reactPost = async(post_id: string) => {
+    try {
+      const response = await reactionApi.react(post_id)
+      if(response.status !== 0) {
+        console.log(response.error)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  return { loading, error, posts, getPosts, canLoadMore, reactPost }
 };

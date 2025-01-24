@@ -1,6 +1,7 @@
 import { POSTS_PER_PAGE } from "@/src/config/config";
 import { followApi } from "@/src/lib/api/follow-api";
 import { postApi } from "@/src/lib/api/post-api";
+import { reactionApi } from "@/src/lib/api/reaction-api";
 import { userApi } from "@/src/lib/api/user-api";
 import { PostModel } from "@/src/models/post";
 import { UserModel } from "@/src/models/user";
@@ -78,5 +79,16 @@ export const useProfile= () => {
         } 
     }, [userProfile])
 
-    return { loading, error, userProfile, fetchUserProfile, handleFollow, canLoadMore, posts, getProfilePosts }
+    const reactPost = async(post_id: string) => {
+      try {
+        const response = await reactionApi.react(post_id)
+        if(response.status !== 0) {
+          console.log(response.error)
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    return { loading, error, userProfile, fetchUserProfile, handleFollow, canLoadMore, posts, getProfilePosts, reactPost }
 }

@@ -7,7 +7,7 @@ import { useEffect, useRef } from "react";
 import { debounce } from "lodash";
 
 export default function Home() {
-  const { loading, error, posts, getPosts, canLoadMore } = usePost();
+  const { loading, error, posts, getPosts, canLoadMore, reactPost } = usePost();
   const observerRef = useRef<HTMLDivElement>(null);
   /* Flag to track if posts have been fetched when open screen */
   const hasFetchPosts = useRef(false); 
@@ -78,7 +78,7 @@ export default function Home() {
           ) : (
             <>
               {posts.map((post) => (
-                <Post key={post.id} post={post} />
+                <Post key={post.id} post={post} onReact={() => reactPost(post.id)} />
               ))}
 
               {/* Loading state */}

@@ -32,6 +32,7 @@ export const ProfileContent = ({ userId }: ProfileContentProps) => {
     canLoadMore,
     loading,
     error,
+    reactPost
   } = useProfile();
   const [imgSrc, setImgSrc] = useState<string>(
     userProfile?.image ?? defaultAvatar,
@@ -193,7 +194,7 @@ export const ProfileContent = ({ userId }: ProfileContentProps) => {
         ) : (
           <>
             {posts.map((post) => (
-              <Post key={post.id} post={post} />
+              <Post key={post.id} post={post} onReact={() => {reactPost(post.id)}} />
             ))}
 
             {/* Loading state */}

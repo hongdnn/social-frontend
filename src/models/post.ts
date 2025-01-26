@@ -10,8 +10,10 @@ export interface PostDTO {
     longitude?: number | null;
     created_date?: Date | null; 
     updated_date?: Date | null; 
-    medias?: MediaDTO[]
-    user?: UserDTO
+    medias?: MediaDTO[];
+    user?: UserDTO;
+    reaction_count?: number;
+    is_reacted?: boolean;
   }
   
   export class PostModel {
@@ -25,6 +27,8 @@ export interface PostDTO {
     updatedDate?: Date | null; 
     medias: MediaModel[];
     user?: UserModel;
+    reactionCount: number;
+    isReacted: boolean;
   
     constructor(
       id: string,
@@ -36,7 +40,9 @@ export interface PostDTO {
       createdDate?: Date | null,
       updatedDate?: Date | null,
       medias?: MediaModel[],
-      user?: UserModel
+      user?: UserModel,
+      reaction_count?: number,
+      is_reacted?: boolean
     ) {
       this.id = id;
       this.content = content;
@@ -47,7 +53,9 @@ export interface PostDTO {
       this.createdDate = new Date(createdDate ?? '');
       this.updatedDate = updatedDate;
       this.medias = medias ?? [];
-      this.user = user
+      this.user = user;
+      this.reactionCount = reaction_count ?? 0;
+      this.isReacted = is_reacted ?? false;
     }
   
     static fromDTO(dto: PostDTO): PostModel {
@@ -61,7 +69,9 @@ export interface PostDTO {
           dto.created_date, 
           dto.updated_date,
           (dto.medias ?? []).map((mediaDTO) => MediaModel.fromDTO(mediaDTO)),
-          dto.user ? UserModel.fromDTO(dto.user) : undefined
+          dto.user ? UserModel.fromDTO(dto.user) : undefined,
+          dto.reaction_count,
+          dto.is_reacted,
         );
       }
     

@@ -11,12 +11,18 @@ export const Post = ({ post, onReact }: { post: PostModel, onReact: () => void }
   const [imgSrc, setImgSrc] = useState<string>(
     post.user?.image || defaultAvatar,
   );
-  const [isReacted, setIsReacted] = useState(false);
+  const [isReacted, setIsReacted] = useState(post.isReacted);
+  const [reactionCount, setReactionCount] = useState<number>(post.reactionCount);
   const handleImageError = () => {
     setImgSrc(defaultAvatar);
   };
 
   const handleReaction = debounce(() => {
+    if (isReacted) {
+      setReactionCount((prev) => Math.max(0, prev - 1));
+    } else {
+      setReactionCount((prev) => prev + 1);
+    }
     setIsReacted(!isReacted);
     onReact();
   }, 200);
@@ -61,6 +67,10 @@ export const Post = ({ post, onReact }: { post: PostModel, onReact: () => void }
               <MessageCircle className="h-6 w-6" />
             </div>
           </div>
+        </div>
+
+        <div className="font-semibold">
+            <span>{reactionCount} {reactionCount <= 1 ? "like" : "likes"}</span>
         </div>
 
         {/* Content */}

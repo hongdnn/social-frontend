@@ -63,6 +63,12 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+export interface ApiListResponse<T> {
+  status: number;
+  message: string;
+  data: T[];
+}
+
 export interface ErrorResponse {
   status: number;
   error?: string;

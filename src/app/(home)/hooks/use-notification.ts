@@ -59,6 +59,19 @@ export const useNotification = () => {
       [],
     );
 
+    const receiveNewNotification = useCallback((notification: NotificationModel) => {
+        setNotifications((prevNotifications) => {
+            const index = prevNotifications.findIndex((noti) => noti.id === notification.id);
+            if (index !== -1) {
+                const newNotifications = [...prevNotifications];
+                newNotifications[index] = notification;
+                return newNotifications;
+            } else {
+                return [notification, ...prevNotifications];
+            }
+        });
+    }, [])
 
-    return { loading, error, notifications, fetchNotifications, canLoadMore, handleNotificationClick }
+
+    return { loading, error, notifications, fetchNotifications, canLoadMore, handleNotificationClick, receiveNewNotification }
 }

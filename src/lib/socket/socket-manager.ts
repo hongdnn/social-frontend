@@ -1,4 +1,5 @@
 import { MessageDTO, MessageModel } from "@/src/models/message";
+import { NotificationModel } from "@/src/models/notification";
 import { io, Socket } from "socket.io-client";
 
 
@@ -13,6 +14,7 @@ export class SocketManager {
     private static instance: SocketManager;
     private socket: Socket | null = null;
     private messageCallbacks: ((message: MessageModel) => void)[] = [];
+    private notificationCallbacks: ((notification: NotificationModel) => void)[] = [];
     private errorCallbacks: ((error: Error) => void)[] = [];
 
     private constructor() {}
@@ -82,14 +84,37 @@ export class SocketManager {
                 console.error("Error parsing incoming message:", error);
             }
         });
+
+        this.socket.on("receive_notification", (response: ServerResponse) => {
+            try {
+                console.log(response)
+                if (response.status === 0) {
+                    const notification = NotificationModel.fromDTO(response.data);
+                    if (notification) {
+                        this.notifyNotification(notification);
+                    }
+                }
+            } catch (error) {
+                console.error("Error parsing notification:", error);
+            }
+        });
     }
 
+    /* Register user message listener */
     public onMessage(callback: (message: MessageModel) => void): () => void {
         this.messageCallbacks.push(callback);
         return () => {
         this.messageCallbacks = this.messageCallbacks.filter(
             (cb) => cb !== callback,
         );
+        };
+    }
+
+    /* Register notification listener */
+    public onNotification(callback: (notification: NotificationModel) => void): () => void {
+        this.notificationCallbacks.push(callback);
+        return () => {
+            this.notificationCallbacks = this.notificationCallbacks.filter(cb => cb !== callback);
         };
     }
 
@@ -114,8 +139,14 @@ export class SocketManager {
         }
     }
 
+    /* Triggering when receive other user message from socket */
     private notifyMessage(message: MessageModel) {
         this.messageCallbacks.forEach((callback) => callback(message));
+    }
+
+     /* Triggering when receive notification from socket */
+    private notifyNotification(notification: NotificationModel) {
+        this.notificationCallbacks.forEach(callback => callback(notification));
     }
 
     private notifyError(error: Error) {

@@ -50,10 +50,10 @@ export const Notification = ({ notification, onNotifcationClick }: NotificationP
           />
           <div className="flex-1">
             <Link
-              href={`/${notification.createdBy?.id}`}
+              href={`/${notification.creator?.id}`}
               className="font-semibold hover:underline"
             >
-              {notification.createdBy?.firstName}
+              {notification.creator?.getFullName()}
             </Link>{" "}
             <span className="text-sm">{getNotificationText(notification)}</span>
             {notification.createdDate && (

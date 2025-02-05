@@ -2,19 +2,33 @@ import { Bell } from "lucide-react";
 import { useEffect } from "react";
 import { Notification } from "./Notification";
 import { useNotification } from "@/src/app/(home)/hooks/use-notification";
+import { useSocket } from "@/src/app/socket-context";
+import { NotificationModel } from "@/src/models/notification";
 
 interface NotificationPanelProps {
   isOpen: boolean;
 }
 
 export const NotificationPanel = ({ isOpen }: NotificationPanelProps) => {
-  const {notifications, loading, fetchNotifications, handleNotificationClick } = useNotification();
+  const {notifications, loading, fetchNotifications, handleNotificationClick, receiveNewNotification } = useNotification();
+  const { subscribeToNotifications } = useSocket();
 
   useEffect(() => {
     if (isOpen) {
       fetchNotifications();
     }
   }, [isOpen, fetchNotifications]);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToNotifications((notification: NotificationModel) => {
+      receiveNewNotification(notification);
+    });
+
+    /* Clean up the subscription when the component unmounts */
+    return () => {
+      unsubscribe();
+    };
+  }, [subscribeToNotifications, receiveNewNotification]);
 
   return (
     <div

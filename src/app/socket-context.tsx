@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { MessageModel } from '@/src/models/message';
 import { SocketManager } from '../lib/socket/socket-manager';
+import { NotificationModel } from '../models/notification';
 
 interface SocketContextType {
   isConnected: boolean;
@@ -15,6 +16,7 @@ interface SocketContextType {
     message_type: string;
   }) => void;
   subscribeToMessages: (callback: (message: MessageModel) => void) => () => void;
+  subscribeToNotifications: (callback: (notification: NotificationModel) => void) => () => void;
 }
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
@@ -58,12 +60,17 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     return socketManager.onMessage(callback);
   }, [socketManager]);
 
+  const subscribeToNotifications = useCallback((callback: (notification: NotificationModel) => void) => {
+    return socketManager.onNotification(callback);
+  }, [socketManager]);
+
   const value: SocketContextType = {
     isConnected,
     connectSocket,
     disconnectSocket,
     sendPrivateMessage,
     subscribeToMessages,
+    subscribeToNotifications,
   };
 
   return (

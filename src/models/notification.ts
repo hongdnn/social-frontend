@@ -11,7 +11,7 @@ export interface NotificationDTO {
     _id?: string;
     type: number;
     created_date?: Date | null;
-    created_by?: UserDTO;
+    creator?: UserDTO;
     post_id?: string;
     target_id: string;
     is_read: boolean;
@@ -21,7 +21,7 @@ export class NotificationModel {
     id: string;
     type: number;
     createdDate: Date | null;
-    createdBy: UserModel | null;
+    creator: UserModel | null;
     postId?: string;
     targetId: string;
     isRead: boolean;
@@ -32,13 +32,13 @@ export class NotificationModel {
         createdDate: Date | null,
         targetId: string,
         isRead: boolean,
-        createdBy?: UserDTO,
+        creator?: UserDTO,
         postId?: string
     ) {
         this.id = id;
         this.type = type;
         this.createdDate = createdDate;
-        this.createdBy = createdBy ? UserModel.fromDTO(createdBy): null;
+        this.creator = creator ? UserModel.fromDTO(creator): null;
         this.postId = postId;
         this.targetId = targetId;
         this.isRead = isRead;
@@ -51,7 +51,7 @@ export class NotificationModel {
             dto.created_date ?? null,
             dto.target_id,
             dto.is_read,
-            dto.created_by,
+            dto.creator,
             dto.post_id
         );
     }

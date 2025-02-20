@@ -6,13 +6,23 @@ import { useState } from "react";
 import { MediaCarousel } from "./MediaCarousel";
 import { debounce } from "lodash";
 
-export const Post = ({ post, onReact }: { post: PostModel, onReact: () => void }) => {
+export const Post = ({
+  post,
+  onReact,
+  onComment,
+}: {
+  post: PostModel;
+  onReact: () => void;
+  onComment: () => void;
+}) => {
   const defaultAvatar = "/default_avatar.svg";
   const [imgSrc, setImgSrc] = useState<string>(
     post.user?.image || defaultAvatar,
   );
   const [isReacted, setIsReacted] = useState(post.isReacted);
-  const [reactionCount, setReactionCount] = useState<number>(post.reactionCount);
+  const [reactionCount, setReactionCount] = useState<number>(
+    post.reactionCount,
+  );
   const handleImageError = () => {
     setImgSrc(defaultAvatar);
   };
@@ -25,6 +35,10 @@ export const Post = ({ post, onReact }: { post: PostModel, onReact: () => void }
     }
     setIsReacted(!isReacted);
     onReact();
+  }, 200);
+
+  const handleComment = debounce(() => {
+    onComment();
   }, 200);
 
   return (
@@ -61,16 +75,21 @@ export const Post = ({ post, onReact }: { post: PostModel, onReact: () => void }
         <div className="mb-4 flex justify-between">
           <div className="flex space-x-4">
             <div>
-              <Heart className={`h-6 w-6 cursor-pointer ${isReacted ? 'text-red-500 fill-current' : null}`} onClick={handleReaction} />
+              <Heart
+                className={`h-6 w-6 cursor-pointer ${isReacted ? "fill-current text-red-500" : null}`}
+                onClick={handleReaction}
+              />
             </div>
             <div>
-              <MessageCircle className="h-6 w-6" />
+              <MessageCircle className="h-6 w-6 cursor-pointer" onClick={handleComment} />
             </div>
           </div>
         </div>
 
         <div className="font-semibold">
-            <span>{reactionCount} {reactionCount <= 1 ? "like" : "likes"}</span>
+          <span>
+            {reactionCount} {reactionCount <= 1 ? "like" : "likes"}
+          </span>
         </div>
 
         {/* Content */}

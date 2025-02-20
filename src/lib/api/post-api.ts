@@ -37,6 +37,13 @@ interface FetchPostsResponse {
   error?: string;
 }
 
+interface GetPostDetailResponse {
+  status: number;
+  message: string;
+  data?: PostModel;
+  error?: string;
+}
+
 export const postApi = {
   /* create aws s3 presign url for each media file */
   generatePresignUrls: async (
@@ -180,4 +187,32 @@ export const postApi = {
       };
     }
   },
+
+  /* When open a post to view detail, comment,... */
+  getPostDetail: async (post_id: string): Promise<GetPostDetailResponse> => {
+    try {
+      const response = await postServiceInstance.get<ApiResponse<PostDTO>>(`/posts/${post_id}`);
+      return {
+        status: response.data.status,
+        message: response.data.message,
+        data: PostModel.fromDTO(response.data.data),
+      };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError<ErrorResponse>;
+        if (axiosError.response && axiosError.response.data) {
+          return {
+            status: axiosError.response.data.status,
+            error: axiosError.response.data.error,
+            message: axiosError.response.data.message,
+          };
+        }
+      }
+      return {
+        status: 1,
+        message: "There's something wrong",
+        error: `${error}`,
+      };
+    }
+  }
 };

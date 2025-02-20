@@ -8,12 +8,15 @@ export const usePost = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [posts, setPosts] = useState<PostModel[]>([]);
+  const [currentPost, setCurrentPost] = useState<PostModel | null>(null);
   const postsRef = useRef<PostModel[]>([]);
+  const currentPostRef = useRef<PostModel | null>(null);
   const [canLoadMore, setCanLoadMore] = useState<boolean>(true);
 
   useEffect(() => {
     postsRef.current = posts;
-  }, [posts]);
+    currentPostRef.current = currentPost;
+  }, [posts, currentPost]);
 
   /* fetch list of posts */
   const getPosts = useCallback(async () => {
@@ -57,5 +60,19 @@ export const usePost = () => {
     }
   }
 
-  return { loading, error, posts, getPosts, canLoadMore, reactPost }
+  const handleClickPost = useCallback(
+    async (postId: string, isOpen: boolean) => {
+      if (!isOpen) {
+        setCurrentPost(null);
+      } else {
+        const post = postsRef.current.find((post) => post.id === postId);
+        if (post) {
+          setCurrentPost(post);
+        }
+      }
+    },
+    [],
+  );
+
+  return { loading, error, posts, getPosts, canLoadMore, reactPost, currentPost, handleClickPost }
 };

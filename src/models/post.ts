@@ -1,5 +1,8 @@
+import { CommentDTO, CommentModel } from "./comment";
 import { MediaDTO, MediaModel } from "./media";
 import { UserDTO, UserModel } from "./user";
+import { immerable } from "immer";
+
 
 export interface PostDTO {
     id?: string;
@@ -14,9 +17,12 @@ export interface PostDTO {
     user?: UserDTO;
     reaction_count?: number;
     is_reacted?: boolean;
+    comments?: CommentDTO[];
   }
   
   export class PostModel {
+    [immerable] = true;
+    
     id: string;
     content: string;
     userId: string;
@@ -29,11 +35,13 @@ export interface PostDTO {
     user?: UserModel;
     reactionCount: number;
     isReacted: boolean;
+    comments: CommentModel[];
   
     constructor(
       id: string,
       content: string,
       userId: string,
+      comments: CommentModel[],
       location?: string | null,
       latitude?: number | null,
       longitude?: number | null,
@@ -42,11 +50,12 @@ export interface PostDTO {
       medias?: MediaModel[],
       user?: UserModel,
       reaction_count?: number,
-      is_reacted?: boolean
+      is_reacted?: boolean,
     ) {
       this.id = id;
       this.content = content;
       this.userId = userId;
+      this.comments = comments;
       this.location = location;
       this.latitude = latitude;
       this.longitude = longitude;
@@ -63,6 +72,7 @@ export interface PostDTO {
           dto.id ?? '',
           dto.content,
           dto.user_id ?? '',
+          (dto.comments ?? []).map((commentDTO) => CommentModel.fromDTO(commentDTO)),
           dto.location,
           dto.latitude,
           dto.longitude,

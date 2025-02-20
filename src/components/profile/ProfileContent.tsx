@@ -194,7 +194,7 @@ export const ProfileContent = ({ userId }: ProfileContentProps) => {
         ) : (
           <>
             {posts.map((post) => (
-              <Post key={post.id} post={post} onReact={() => {reactPost(post.id)}} />
+              <Post key={post.id} post={post} onReact={() => {reactPost(post.id)}} onComment={() => {}} />
             ))}
 
             {/* Loading state */}

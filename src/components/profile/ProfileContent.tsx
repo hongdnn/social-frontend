@@ -7,6 +7,7 @@ import { useProfile } from "@/src/app/(profile)/[id]/hooks/use-profile";
 import { debounce } from "lodash";
 import { Post } from "../home/Post";
 import { parseUserFromJson, UserModel } from "@/src/models/user";
+import PostDetailModal from "../home/PostDetailModal";
 
 interface ProfileContentProps {
   userId: string;
@@ -32,7 +33,9 @@ export const ProfileContent = ({ userId }: ProfileContentProps) => {
     canLoadMore,
     loading,
     error,
-    reactPost
+    reactPost,
+    currentPost, 
+    handleClickPost
   } = useProfile();
   const [imgSrc, setImgSrc] = useState<string>(
     userProfile?.image ?? defaultAvatar,
@@ -96,6 +99,7 @@ export const ProfileContent = ({ userId }: ProfileContentProps) => {
   }, 300);
 
   return (
+    <>
     <div className="mx-auto mt-6 flex w-full flex-col overflow-y-auto p-4">
       <div className="mx-auto mb-8 flex w-[60%] flex-col items-center">
         <div className="flex flex-col items-center gap-8 space-x-16 md:flex-row md:items-center md:justify-center">
@@ -194,7 +198,7 @@ export const ProfileContent = ({ userId }: ProfileContentProps) => {
         ) : (
           <>
             {posts.map((post) => (
-              <Post key={post.id} post={post} onReact={() => {reactPost(post.id)}} onComment={() => {}} />
+              <Post key={post.id} post={post} onReact={() => {reactPost(post.id)}} onComment={() => handleClickPost(post.id, true)} />
             ))}
 
             {/* Loading state */}
@@ -217,5 +221,13 @@ export const ProfileContent = ({ userId }: ProfileContentProps) => {
       </div>
       {/* </div> */}
     </div>
+
+    {currentPost && (
+        <PostDetailModal
+          postId={currentPost.id}
+          onClose={() => handleClickPost("", false)}
+        />
+      )}
+    </>
   );
 };

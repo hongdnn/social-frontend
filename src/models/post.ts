@@ -16,6 +16,7 @@ export interface PostDTO {
     medias?: MediaDTO[];
     user?: UserDTO;
     reaction_count?: number;
+    comment_count?: number;
     is_reacted?: boolean;
     comments?: CommentDTO[];
   }
@@ -34,6 +35,7 @@ export interface PostDTO {
     medias: MediaModel[];
     user?: UserModel;
     reactionCount: number;
+    commentCount: number;
     isReacted: boolean;
     comments: CommentModel[];
   
@@ -50,6 +52,7 @@ export interface PostDTO {
       medias?: MediaModel[],
       user?: UserModel,
       reaction_count?: number,
+      comment_count?: number,
       is_reacted?: boolean,
     ) {
       this.id = id;
@@ -64,6 +67,7 @@ export interface PostDTO {
       this.medias = medias ?? [];
       this.user = user;
       this.reactionCount = reaction_count ?? 0;
+      this.commentCount = comment_count ?? 0;
       this.isReacted = is_reacted ?? false;
     }
   
@@ -81,6 +85,7 @@ export interface PostDTO {
           (dto.medias ?? []).map((mediaDTO) => MediaModel.fromDTO(mediaDTO)),
           dto.user ? UserModel.fromDTO(dto.user) : undefined,
           dto.reaction_count,
+          dto.comment_count,
           dto.is_reacted,
         );
       }

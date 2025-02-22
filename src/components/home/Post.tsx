@@ -56,9 +56,16 @@ export const Post = ({
               onError={handleImageError}
             />
             <div className="flex flex-col">
-              <span className="font-medium">
-                {post.user?.firstName} {post.user?.lastName}
-              </span>
+              <div className="flex items-center">
+                <span className="font-medium">
+                  {post.user?.firstName} {post.user?.lastName}
+                </span>
+                <span className="mx-2 text-xs uppercase text-gray-500">•</span>
+                <span className="text-xs uppercase text-gray-500">
+                  {post.createdDate && format(post.createdDate, "MMM d, yyyy")}
+                </span>
+              </div>
+
               {post.location && (
                 <span className="text-sm text-gray-500">{post.location}</span>
               )}
@@ -81,7 +88,10 @@ export const Post = ({
               />
             </div>
             <div>
-              <MessageCircle className="h-6 w-6 cursor-pointer" onClick={handleComment} />
+              <MessageCircle
+                className="h-6 w-6 cursor-pointer"
+                onClick={handleComment}
+              />
             </div>
           </div>
         </div>
@@ -93,17 +103,23 @@ export const Post = ({
         </div>
 
         {/* Content */}
-        <div className="mb-2">
+        <div>
           <span className="mr-2 font-semibold">
             {post.user?.firstName} {post.user?.lastName}
           </span>
           <span className="inline whitespace-pre-wrap">{post.content}</span>
         </div>
 
-        {/* Timestamp */}
-        <div className="text-xs uppercase text-gray-500">
-          {post.createdDate && format(post.createdDate, "MMM d, yyyy")}
-        </div>
+        {/* Number of comments */}
+        {post.commentCount > 0 && (
+          <p
+          className="cursor-pointer text-sm text-gray-500 mt-2"
+          onClick={handleComment}
+        >
+          View all {post.commentCount} comments
+        </p>
+        )}
+        
       </div>
     </div>
   );

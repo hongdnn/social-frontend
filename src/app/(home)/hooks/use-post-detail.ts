@@ -5,10 +5,10 @@ import { reactionApi } from "@/src/lib/api/reaction-api";
 import { PostModel } from "@/src/models/post";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { produce } from "immer";
-import { UserModel } from "@/src/models/user";
+import { parseUserFromJson, UserModel } from "@/src/models/user";
 
 export const usePostDetail = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPost, setCurrentPost] = useState<PostModel | null>(null);
   const [page, setPage] = useState(1);
@@ -20,6 +20,7 @@ export const usePostDetail = () => {
   const [isCommenting, setCommenting] = useState(false);
   const [reactionCount, setReactionCount] = useState(0);
   const [currentUser, setCurrentUser] = useState<UserModel | null>(null);
+  const commentsContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     currentPostRef.current = currentPost;
@@ -51,11 +52,54 @@ export const usePostDetail = () => {
           setCanLoadMore(false);
         }
       }
+      console.log(pageRef.current);
     } catch (error) {
       console.log(error);
       setError("There is something wrong");
     } finally {
       setLoading(false);
+    }
+  }, []);
+
+  const loadCurrentUser = useCallback(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setCurrentUser(parseUserFromJson(storedUser));
+    }
+  }, [])
+
+  const loadMoreComment = useCallback(async () => {
+    console.log(pageRef.current);
+    try {
+      const commentResponse = await commentApi.fetchComments(
+        currentPostRef.current?.id ?? "",
+        COMMENTS_PER_PAGE,
+        pageRef.current,
+      );
+      if (commentResponse.status === 0) {
+        if (commentResponse.comments.length > 0) {
+          setCurrentPost(
+            produce((draft) => {
+              if (draft) {
+                /* Prevent from adding new comments that the current user has just created */
+                const existingIds = new Set(draft.comments.map((c) => c.id));
+                const newComments = commentResponse.comments.filter(
+                  (c) => !existingIds.has(c.id),
+                );
+                draft.comments.push(...newComments);
+              }
+            }),
+          );
+        }
+        setPage(pageRef.current + 1);
+        if (commentResponse.comments.length < COMMENTS_PER_PAGE) {
+          setCanLoadMore(false);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+
     }
   }, []);
 
@@ -95,11 +139,15 @@ export const usePostDetail = () => {
         setCurrentPost(
           produce((draft) => {
             if (draft) {
-              draft.comments.push(response.comment!);
+              draft.comments.unshift(response.comment!);
             }
           }),
         );
         setComment("");
+        /* Scroll to top of comments */
+        setTimeout(() => {
+          commentsContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+        }, 100);
       }
 
       return response.comment;
@@ -121,7 +169,10 @@ export const usePostDetail = () => {
     setComment,
     isReacted,
     reactionCount,
-    setCurrentUser,
-    getPostDetail
+    loadCurrentUser,
+    getPostDetail,
+    canLoadMore,
+    loadMoreComment,
+    commentsContainerRef
   };
 };

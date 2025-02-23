@@ -8,6 +8,8 @@ import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { parseUserFromJson, UserModel } from "@/src/models/user";
 import { NotificationPanel } from "./NotificationPanel";
+import PostDetailModal from "../home/PostDetailModal";
+import { NotificationModel } from "@/src/models/notification";
 
 export const Toolbar: React.FC = (): ReactNode => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,8 +17,9 @@ export const Toolbar: React.FC = (): ReactNode => {
   const router = useRouter();
   const [user, setUser] = useState<UserModel | null>(null);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isPostDetailOpen, setIsPostDetailOpen] = useState<string | null>(null);
 
-  const handleNavClick = (type?: string) => {
+  const handleNavClick = (type?: string, noti?: NotificationModel) => {
     if (type === "search") {
       setIsSearchOpen(!isSearchOpen);
       setIsNotificationOpen(false);
@@ -26,6 +29,7 @@ export const Toolbar: React.FC = (): ReactNode => {
     } else {
       setIsSearchOpen(false);
       setIsNotificationOpen(false);
+      setIsPostDetailOpen(noti !== undefined ? noti.postId ?? '' : null);
     }
   };
 
@@ -110,7 +114,13 @@ export const Toolbar: React.FC = (): ReactNode => {
       />
 
       {isSearchOpen && <SearchPanel isOpen={isSearchOpen} />}
-      {isNotificationOpen && <NotificationPanel isOpen={isNotificationOpen} />}
+      {isNotificationOpen && <NotificationPanel isOpen={isNotificationOpen} onClick={(noti) => handleNavClick("post", noti)} />}
+      {isPostDetailOpen && (
+        <PostDetailModal
+          postId={isPostDetailOpen}
+          onClose={() => handleNavClick("post")}
+        />
+      )}
     </>
   );
 };

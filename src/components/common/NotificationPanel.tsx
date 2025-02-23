@@ -3,14 +3,22 @@ import { useEffect } from "react";
 import { Notification } from "./Notification";
 import { useNotification } from "@/src/app/(home)/hooks/use-notification";
 import { useSocket } from "@/src/app/socket-context";
-import { NotificationModel } from "@/src/models/notification";
+import { NotificationModel, NotificationType } from "@/src/models/notification";
+import { debounce } from "lodash";
 
 interface NotificationPanelProps {
   isOpen: boolean;
+  onClick: (notification: NotificationModel) => void;
 }
 
-export const NotificationPanel = ({ isOpen }: NotificationPanelProps) => {
-  const {notifications, loading, fetchNotifications, handleNotificationClick, receiveNewNotification } = useNotification();
+export const NotificationPanel = ({ isOpen, onClick }: NotificationPanelProps) => {
+  const {
+    notifications,
+    loading,
+    fetchNotifications,
+    receiveNewNotification,
+    readNotification,
+  } = useNotification();
   const { subscribeToNotifications } = useSocket();
 
   useEffect(() => {
@@ -29,6 +37,17 @@ export const NotificationPanel = ({ isOpen }: NotificationPanelProps) => {
       unsubscribe();
     };
   }, [subscribeToNotifications, receiveNewNotification]);
+
+  const onNotificationClick = debounce((notification: NotificationModel) => {
+    readNotification(notification.id);
+    if (
+      notification.type === NotificationType.REACTION ||
+      notification.type === NotificationType.COMMENT ||
+      notification.type === NotificationType.REPLY_COMMENT
+    ) {
+      onClick(notification);
+    }
+  }, 200);
 
   return (
     <div
@@ -56,12 +75,7 @@ export const NotificationPanel = ({ isOpen }: NotificationPanelProps) => {
               <Notification
                 key={notification.id}
                 notification={notification}
-                onNotifcationClick={() => handleNotificationClick(
-                  notification.id,
-                  notification.type,
-                  notification.targetId,
-                  notification.postId,
-                )}
+                onNotifcationClick={() => onNotificationClick(notification)}
               />
             ))}
           </div>

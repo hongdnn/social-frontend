@@ -30,4 +30,13 @@ export const notificationApi = {
       }
     },
 
+    readNotification: async (notificationId: string): Promise<boolean> => {
+      try {
+        const response = await chatServiceInstance.put(`/notifications/${notificationId}`);
+        return response.data.status === 0;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    },
 }
